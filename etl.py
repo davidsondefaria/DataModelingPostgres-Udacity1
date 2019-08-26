@@ -10,25 +10,18 @@ def process_song_file(cur, filepath):
     df = pd.read_json(filepath, lines=True)
     
     # insert song record
-    song_data = []
-    
-    song_data.append(df['song_id'].values[0])
-    song_data.append(df['title'].values[0])
-    song_data.append(df['artist_id'].values[0])
-    song_data.append(df['year'].values[0].item())
-    song_data.append(df['duration'].values[0].item())
-    
-    cur.execute(song_table_insert, song_data)
+    song_data = df[['song_id','title', 'artist_id', 'year', 'duration']]
+    song_data = song_data.drop_duplicates()
+
+    for i, row in song_data.iterrows():
+        cur.execute(song_table_insert, row)
     
     # insert artist record
-    artist_data = []
-    artist_data.append(df['artist_id'].values[0])
-    artist_data.append(df['artist_name'].values[0])
-    artist_data.append(df['artist_location'].values[0])
-    artist_data.append(df['artist_latitude'].values[0].item())
-    artist_data.append(df['artist_longitude'].values[0].item())
+    artist_data = df[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']]
+    artist_data = artist_data.drop_duplicates()
 
-    cur.execute(artist_table_insert, artist_data)
+    for i, row in artist_data.iterrows():
+        cur.execute(artist_table_insert, row)
 
 
 def process_log_file(cur, filepath):
@@ -40,10 +33,12 @@ def process_log_file(cur, filepath):
     for i, row in df.iterrows():
         if(row['page'] != 'NextSong'):
             dropIndex.append(i)
-    df.drop(dropIndex, inplace=True)    
+    df.drop(dropIndex, inplace=True)
+    df.drop_duplicates()
     
     # convert timestamp column to datetime
-    t = list(map(pd.Timestamp, df['ts']))
+#     t = list(map(pd.Timestamp, (df['ts'], unit='ms')))
+    t = pd.to_datetime(df['ts'], unit='ms')
     
     # insert time data records
     time_data = [list(x.time() for x in t),
