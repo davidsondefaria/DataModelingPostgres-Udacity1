@@ -6,6 +6,13 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """ Get song and artist information from song_dataset and insert into song_table and artist_table.
+    
+    Parameters:
+    Argument1: Connect cursor to connect to database
+    Argument2: path of dataset
+    
+    """
     # open song file
     df = pd.read_json(filepath, lines=True)
     
@@ -25,6 +32,14 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """ Get time and and information from log_dataset and insert into time_table and user_table.
+    Get songs from a specific page of log_dataset, match song_id and artist_id and insert into songplay_table.
+    
+    Parameters:
+    Argument1: Connect cursor to connect to database
+    Argument2: path of dataset
+    
+    """
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -37,7 +52,6 @@ def process_log_file(cur, filepath):
     df.drop_duplicates()
     
     # convert timestamp column to datetime
-#     t = list(map(pd.Timestamp, (df['ts'], unit='ms')))
     t = pd.to_datetime(df['ts'], unit='ms')
     
     # insert time data records
@@ -73,7 +87,6 @@ def process_log_file(cur, filepath):
 
     # insert songplay records
     for index, row in df.iterrows():
-#         print(song_select)
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
         results = cur.fetchone()
@@ -81,15 +94,26 @@ def process_log_file(cur, filepath):
         if results:
             print(results, row.song, row.artist, row.length)
             songid, artistid = results
+            
+            # insert songplay record
+            songplay_data = (pd.Timestamp(row.ts).time(), row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+            cur.execute(songplay_table_insert, songplay_data)
         else:
             songid, artistid = None, None
         
-        # insert songplay record
-        songplay_data = (pd.Timestamp(row.ts).time(), row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
-        cur.execute(songplay_table_insert, songplay_data)
+        
 
 
 def process_data(cur, conn, filepath, func):
+    """ Find all paths from dataset and call functions to process the data.
+    
+    Argument1: Connect cursor to connect to database
+    Argument2: Connection to data
+    Argument3: Path for dataset
+    Argument4: Fucntion to process data
+
+    
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
