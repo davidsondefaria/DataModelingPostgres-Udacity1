@@ -1,8 +1,8 @@
 # Introduction
 
-This project is part of Udemy's Data Engineering Course.
+This project is part of Udacity's Data Engineering Course.
 
-The code was written along the lines of the default Jupyter notebook workspace provided by Udemy.
+The code was written along the lines of the default Jupyter notebook workspace provided by Udacity.
 
 Author: [Davidson de Faria](https://github.com/davidsondefaria)
 
@@ -11,8 +11,8 @@ Author: [Davidson de Faria](https://github.com/davidsondefaria)
  - create_tables.py: This file will manage de database, creating and droping the tables;
  - sql_queries.py: This file contains the python alias for querys used in Postgres;
  - etl.py: Project core. Here, we process the data contained in dataset, getting information in song_data and log_data and inserting into database created by `create_tables.py`;
- - etl.ipynb: Provided by Udemy, this files contains a Jupyter notebook codes for learning and testing;
- - test.ipynb: Provided by Udemy, this files contains a Jupyter notebook for test our program;
+ - etl.ipynb: Provided by Udacity, this files contains a Jupyter notebook codes for learning and testing;
+ - test.ipynb: Provided by Udacity, this files contains a Jupyter notebook for test our program;
  - data: This folder contains the dataset.
  
 ## How to Run
